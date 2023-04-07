@@ -1,61 +1,37 @@
 import React, {useState} from 'react';
-import './App.css';
-
-import {Editor} from "react-draft-wysiwyg";
-import {convertToRaw, EditorState} from "draft-js";
-import draftToHtml from "draftjs-to-html";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import './App.css'
+import ReactQuill from "react-quill";
+import 'react-quill/dist/quill.snow.css'
 const App = () => {
 
+    const [value,setValue] = useState('')
 
-    const [content, setContent] = useState<string>('')
-    const [editorState, setEditorState] = useState(() =>
-        EditorState.createEmpty()
-    );
-
-    const handleImageUpload = (file: File) => {
-        return new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onloadend = () => {
-                resolve(reader.result as string);
-            };
-        });
-    };
-    const uploadCallback = async (file: File) => {
-        try {
-            const imageUrl = await handleImageUpload(file);
-            return { data: { link: imageUrl } };
-        } catch (e) {
-            console.error(e);
-        }
-    };
+    const modules  = {
+        toolbar:[
+            [{header:[1,2,3,4,5,6,false]}],
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'script': 'sub'}, { 'script': 'super' }],
+            [{ 'indent': '-1'}, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            ['link', 'image'],
+            ['clean']
+        ]
+    }
 
     return (
-        <Editor
-            toolbarClassName="toolbarClassName"
-            wrapperClassName="wrapperClassName"
-            editorClassName="editorClassName"
-            editorState={editorState}
-            placeholder="Пишу хуйню на стэке PIDOR"
-            onEditorStateChange={newState=>{
-                setEditorState(newState)
-                setContent(draftToHtml(convertToRaw(newState.getCurrentContent())))
-            }}
-            toolbar={{
-                options:['inline','blockType','fontSize','list', 'textAlign', 'history', 'embedded', 'emoji', 'image'],
-                inline:{isDropdown:true},
-                list:{isDropdown:true},
-                textAlign:{isDropdown:true},
-                link:{isDropdown:true},
-                history:{isDropdown:true},
-                image: {
-                    uploadCallback,
-                    previewImage: true,
-                    alt: { present: true, mandatory: false },
-                },
-            }}
-        />
+        <div>
+          <ReactQuill
+              theme='snow'
+              value={value}
+              onChange={(e)=>setValue(e)}
+              modules={modules}
+          />
+        </div>
     );
 };
 
